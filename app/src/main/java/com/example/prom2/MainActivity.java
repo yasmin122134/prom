@@ -88,17 +88,11 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.util.Arrays;
 
 
 // Source - https://stackoverflow.com/a/52384616
@@ -108,11 +102,11 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     // Sensors & SensorManager
-    private Sensor magnetometer;
+    private Sensor gyro;
     private SensorManager mSensorManager;
 
     // Storage for Sensor readings
-    private float[] mGeomagnetic = null;
+    private float[] gyroReadings = null;
     private TextView textView;
 
 
@@ -127,14 +121,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         // Get a reference to the magnetometer
-        magnetometer = mSensorManager
-                .getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        gyro = mSensorManager
+                .getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
         // Exit unless sensor are available
-        if (null == magnetometer)
+        if (null == gyro)
             finish();
 
-//        textView =
+        textView = (TextView)findViewById(R.id.textview);
 
     }
 
@@ -144,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // Register for sensor updates
 
-        mSensorManager.registerListener(this, magnetometer,
+        mSensorManager.registerListener(this, gyro,
                 SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -160,48 +154,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        // Acquire magnetometer event data
-        // If we have readings from both sensors then
-        // use the readings to compute the device's orientation
-        // and then update the display.
 
-        if (mGeomagnetic != null) {
-            String message = "mx : "+mGeomagnetic[0]+" my : "+mGeomagnetic[1]+" mz : "+mGeomagnetic[2];
+        if (gyroReadings != null) {
+            String message = "mx : "+ gyroReadings[0]+" my : "+ gyroReadings[1]+" mz : "+ gyroReadings[2];
             Log.d("TAG", message);
-
-            // Inflate the custom Toast layout
-            LayoutInflater inflater = LayoutInflater.from(context);
-            View toastView = inflater.inflate(R.layout.custom_toast, null);
-            TextView toastMessage = toastView.findViewById(R.id.toast_message);
-            toastMessage.setText(message);
-
-            // Create and configure the Toast
-            Toast toast = new Toast(context);
-            toast.setView(toastView);
-            toast.setDuration(duration);
-            toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, toastOffsetY);
-
-            // Show the Toast
-            toast.show();
+            textView.setText(message);
         }
-        else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+        else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
 
-            mGeomagnetic = new float[3];
-            System.arraycopy(event.values, 0, mGeomagnetic, 0, 3);
+            gyroReadings = new float[3];
+            System.arraycopy(event.values, 0, gyroReadings, 0, 3);
 
         }
 
 
     }
 
-    // Source - https://stackoverflow.com/a/4873320
-// Posted by Frank C., modified by community. See post 'Timeline' for change history
-// Retrieved 2026-03-19, License - CC BY-SA 3.0
 
-    public void updateTextView(String toThis) {
-        TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText(toThis);
-    }
+
 
 
     @Override
