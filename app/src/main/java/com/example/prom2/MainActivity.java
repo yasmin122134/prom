@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     // Storage for Sensor readings
     private float[] mGeomagnetic = null;
+    private TextView textView;
 
 
 
@@ -132,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Exit unless sensor are available
         if (null == magnetometer)
             finish();
+
+//        textView =
 
     }
 
