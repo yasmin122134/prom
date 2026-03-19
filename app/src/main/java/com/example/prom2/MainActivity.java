@@ -128,6 +128,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (null == gyro)
             finish();
 
+        mSensorManager.registerListener(this, gyro,
+                SensorManager.SENSOR_DELAY_NORMAL);
+
         textView = (TextView)findViewById(R.id.textview);
 
     }
@@ -159,6 +162,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             String message = "mx : "+ gyroReadings[0]+" my : "+ gyroReadings[1]+" mz : "+ gyroReadings[2];
             Log.d("TAG", message);
             textView.setText(message);
+            if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+
+                gyroReadings = new float[3];
+                System.arraycopy(event.values, 0, gyroReadings, 0, 3);
+
+            }
         }
         else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
 
