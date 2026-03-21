@@ -90,9 +90,11 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 
 // Source - https://stackoverflow.com/a/52384616
@@ -106,8 +108,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager mSensorManager;
 
     // Storage for Sensor readings
-    private float[] gyroReadings = null;
+    private double[] gyroReadings = null;
+    private List<Double> gyroHistX = new ArrayList<Double>();
     private TextView textView;
+    private Button button;
+    private int sensType = Sensor.TYPE_GYROSCOPE;
 
 
 
@@ -122,13 +127,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // Get a reference to the magnetometer
         gyro = mSensorManager
-                .getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+                .getDefaultSensor(sensType);
 
         // Exit unless sensor are available
         if (null == gyro)
             finish();
 
         textView = (TextView)findViewById(R.id.textview);
+        button = (Button)findViewById(R.id.button_first);
 
     }
 
@@ -154,26 +160,29 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-
+        if (event.sensor.getType() == sensType) {
+            gyroReadings = new double[3];
+            System.arraycopy(event.values, 0, gyroReadings, 0, 3);
+            gyroHistX.add(gyroReadings[0]);
+        }
         if (gyroReadings != null) {
-
             String message = "mx : "+ gyroReadings[0]+"\nmy : "+ gyroReadings[1]+"\nmz : "+ gyroReadings[2];
             Log.d("TAG", message);
             textView.setText(message);
-            if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-
-                gyroReadings = new float[3];
-                System.arraycopy(event.values, 0, gyroReadings, 0, 3);
-
-            }
-        }
-        else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-
-            gyroReadings = new float[3];
-            System.arraycopy(event.values, 0, gyroReadings, 0, 3);
-
+            gyroHistX.add(gyroReadings[0]);
         }
 
+    }
+
+
+    public void calcFFT(){
+        double[] img = new double[gyroHistX.size()];
+        double[] real = new double[gyroHistX.size()];
+        for (int i = 0; i < gyroHistX.size(); i++) {
+            real[i] = gyroHistX.get(i);
+        }
+        double[] res = FFTbase.fft(real, img, true);
+        Log.d()
 
     }
 
