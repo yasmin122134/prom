@@ -90,16 +90,35 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
+import android.graphics.Color;
+import android.os.Bundle;
 
-// Source - https://stackoverflow.com/a/52384616
-// Posted by Maxouille
-// Retrieved 2026-03-19, License - CC BY-SA 4.0
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -135,6 +154,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         textView = (TextView)findViewById(R.id.textview);
         button = (Button)findViewById(R.id.button_first);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawLineChart();
+            }
+        });
 
     }
 
@@ -182,12 +207,73 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             real[i] = gyroHistX.get(i);
         }
         double[] res = FFTbase.fft(real, img, true);
-        Log.d()
+//        Log.d()
 
     }
 
 
+    private void drawLineChart() {
+        LineChart lineChart = findViewById(R.id.lineChart);
+        List<Entry> lineEntries = getDataSet();
+        LineDataSet lineDataSet = new LineDataSet(lineEntries, "Work");
+        lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        lineDataSet.setHighlightEnabled(true);
+        lineDataSet.setLineWidth(2);
+        lineDataSet.setColor(Color.RED);
+        lineDataSet.setCircleColor(Color.YELLOW);
+        lineDataSet.setCircleRadius(6);
+        lineDataSet.setCircleHoleRadius(3);
+        lineDataSet.setDrawCircles(false);
+        lineDataSet.setDrawHighlightIndicators(true);
+        lineDataSet.setHighLightColor(Color.RED);
+        lineDataSet.setValueTextSize(12);
+        lineDataSet.setValueTextColor(Color.DKGRAY);
+        lineDataSet.setMode(LineDataSet.Mode.STEPPED);
 
+        LineData lineData = new LineData(lineDataSet);
+        lineChart.getDescription().setTextSize(12);
+        lineChart.getDescription().setEnabled(false);
+        lineChart.setDrawMarkers(false);
+        lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        lineChart.animateY(1000);
+        lineChart.getXAxis().setGranularityEnabled(true);
+        lineChart.getXAxis().setGranularity(1.0f);
+        lineChart.setData(lineData);
+
+        ArrayList<String> xAxisLabel = new ArrayList<>();
+        xAxisLabel.add("Rest");
+        xAxisLabel.add("Work");
+        xAxisLabel.add("2-up");
+
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setAxisMaximum(3);
+        xAxis.setGranularity(1f);
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(xAxisLabel) {
+            @Override
+            public String[] getValues() {
+                return super.getValues();
+            }
+        });
+
+        YAxis yAxis = lineChart.getAxisLeft();
+        yAxis.setAxisMinimum(0);
+        yAxis.setAxisMaximum(24);
+
+        lineChart.getAxisRight().setEnabled(false);
+
+        lineChart.invalidate();
+
+    }
+
+    private List<Entry> getDataSet() {
+        List<Entry> lineEntries = new ArrayList<>();
+        for (int i = 0; i < gyroHistX.size(); i++) {
+            double d = gyroHistX.get(i);
+
+            lineEntries.add(new Entry(i, (float) d));
+        }
+        return lineEntries;
+    }
 
 
     @Override
