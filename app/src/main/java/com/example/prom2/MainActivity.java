@@ -95,6 +95,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -127,8 +128,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager mSensorManager;
 
     // Storage for Sensor readings
-    private double[] gyroReadings = null;
-    private List<Double> gyroHistX = new ArrayList<Double>();
+    private float[] gyroReadings = null;
+    private List<Float> gyroHistX = new ArrayList<Float>();
     private TextView textView;
     private Button button;
     private int sensType = Sensor.TYPE_GYROSCOPE;
@@ -158,6 +159,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onClick(View v) {
                 drawLineChart();
+                Log.d("DRAW", "8");
+
             }
         });
 
@@ -186,13 +189,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == sensType) {
-            gyroReadings = new double[3];
+            gyroReadings = new float[3];
             System.arraycopy(event.values, 0, gyroReadings, 0, 3);
             gyroHistX.add(gyroReadings[0]);
         }
         if (gyroReadings != null) {
             String message = "mx : "+ gyroReadings[0]+"\nmy : "+ gyroReadings[1]+"\nmz : "+ gyroReadings[2];
-            Log.d("TAG", message);
+//            Log.d("TAG", message);
             textView.setText(message);
             gyroHistX.add(gyroReadings[0]);
         }
@@ -200,15 +203,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-    public void calcFFT(){
-        double[] img = new double[gyroHistX.size()];
-        double[] real = new double[gyroHistX.size()];
-        for (int i = 0; i < gyroHistX.size(); i++) {
+
+    public double[] calcFFT(){
+        int n = gyroHistX.size();
+        double ld = Math.log(n) / Math.log(2.0);
+        int size = (int) n;
+        Log.d("FFT", String.valueOf(size));
+        double[] img = new double[32];
+        double[] real = new double[32];
+
+        for (int i = 0; i < 32; i++) {
             real[i] = gyroHistX.get(i);
         }
-        double[] res = FFTbase.fft(real, img, true);
-//        Log.d()
 
+        return FFTbase.fft(real, img, true);
     }
 
 
@@ -230,20 +238,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         lineDataSet.setValueTextColor(Color.DKGRAY);
         lineDataSet.setMode(LineDataSet.Mode.STEPPED);
 
+        Log.d("DRAW", "1");
+
         LineData lineData = new LineData(lineDataSet);
         lineChart.getDescription().setTextSize(12);
         lineChart.getDescription().setEnabled(false);
         lineChart.setDrawMarkers(false);
         lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChart.animateY(1000);
+        lineChart.animateY(1000000);
         lineChart.getXAxis().setGranularityEnabled(true);
         lineChart.getXAxis().setGranularity(1.0f);
         lineChart.setData(lineData);
+
+        Log.d("DRAW", "2");
+
 
         ArrayList<String> xAxisLabel = new ArrayList<>();
         xAxisLabel.add("Rest");
         xAxisLabel.add("Work");
         xAxisLabel.add("2-up");
+
+        Log.d("DRAW", "3");
+
 
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setAxisMaximum(3);
@@ -255,22 +271,34 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
+        Log.d("DRAW", "4");
+
         YAxis yAxis = lineChart.getAxisLeft();
         yAxis.setAxisMinimum(0);
         yAxis.setAxisMaximum(24);
 
+        Log.d("DRAW", "5");
+
+
         lineChart.getAxisRight().setEnabled(false);
 
+        Log.d("DRAW", "6");
+
+
         lineChart.invalidate();
+
+        Log.d("DRAW", "7");
+
 
     }
 
     private List<Entry> getDataSet() {
         List<Entry> lineEntries = new ArrayList<>();
-        for (int i = 0; i < gyroHistX.size(); i++) {
-            double d = gyroHistX.get(i);
+        double[] res = calcFFT();
+        for (int i = 0; i < res.length; i++) {
+            double d = res[i];
 
-            lineEntries.add(new Entry(i, (float) d));
+            lineEntries.add(new Entry((float) d, i));
         }
         return lineEntries;
     }

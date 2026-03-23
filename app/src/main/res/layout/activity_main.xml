@@ -12,19 +12,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Welcome To"
+        android:textColor="@color/pink"
         android:textSize="26sp"
         android:textStyle="bold"
-        android:textColor="@color/pink"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.741" />
 
     <Button
         android:id="@+id/button_first"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_marginTop="632dp"
         android:text="click to calculate fourier"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -32,7 +35,9 @@
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"
         android:layout_width="match_parent"
-        android:layout_height="300dp"/>
+        android:layout_height="300dp"
+        tools:layout_editor_absoluteX="32dp"
+        tools:layout_editor_absoluteY="109dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

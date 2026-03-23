@@ -4,6 +4,8 @@ package com.example.prom2;
 // Posted by alcor, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-03-21, License - CC BY-SA 4.0
 
+import android.util.Log;
+
 /**
  * @author Orlando Selenu
  * Originally written in the Summer of 2008
@@ -107,6 +109,7 @@ public class FFTbase {
         // be possible to do this stuff in the earlier parts of the code, but
         // it's here to readability).
         double[] newArray = new double[xReal.length * 2];
+        Log.d("FFT", "newArray size: " + newArray.length);
         double radice = 1 / Math.sqrt(n);
         for (int i = 0; i < newArray.length; i += 2) {
             int i2 = i / 2;
